@@ -1,16 +1,21 @@
-import json
-from uuid import uuid4
-
 from openai import OpenAI
 
 from common.settings import OPENAI_API_KEY
 
 
 class ChatUtil(object):
+    client = None
+    model = 'gpt-4'
+
     def __init__(self):
-        self.client = OpenAI(api_key=OPENAI_API_KEY)
-        self.model = 'gpt-4'
+        if self.client is None:
+            self.client = ChatUtil.get_client()
+        self.model = ChatUtil.model
         self.messages = []
+
+    @classmethod
+    def get_client(cls):
+        return OpenAI(api_key=OPENAI_API_KEY)
 
     def chat(self, message):
         if len(self.messages) == 6:
@@ -18,11 +23,18 @@ class ChatUtil(object):
             self.messages.pop(0)
         self.messages.append({"role": "user", "content": message})
         stream = self.client.chat.completions.create(
-            model="gpt-4",
+            model=self.model,
             messages=self.messages,
             stream=True,
         )
         return stream
+
+    @classmethod
+    def create_chat(cls):
+        chat = ChatUtil()
+        chat.messages.clear()
+        chat.client = ChatUtil.get_client()
+        return chat
 
     # Example dummy function hard coded to return the same weather
     # In production, this could be your backend API or an external API
@@ -115,7 +127,6 @@ class ChatUtil(object):
 if __name__ == "__main__":
     # 以下代码用于直接运行该文件时测试该文件中的工具类功能
     chat = ChatUtil()
-    chat_id = uuid4()
     msg = True
     messages = []
     while msg:
