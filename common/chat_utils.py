@@ -17,11 +17,10 @@ class ChatUtil(object):
     def get_client(cls):
         return OpenAI(api_key=OPENAI_API_KEY)
 
-    def chat(self, message):
-        if len(self.messages) == 6:
+    def chat(self, msg_list):
+        self.messages = msg_list
+        if len(self.messages) >= 6:
             self.messages.pop(0)
-            self.messages.pop(0)
-        self.messages.append({"role": "user", "content": message})
         stream = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,

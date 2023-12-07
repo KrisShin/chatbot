@@ -9,10 +9,10 @@ class ResponseModel(BaseModel):
 
 
 class ChatValidator(BaseModel):
-    msg: str
+    messages: list
 
-    @validator('msg')
-    def validate_msg(cls, v):
-        if not v:
-            raise ValueError('msg is required')
-        return v
+    @validator('messages')
+    def validate_msg(cls, msg_list):
+        if not msg_list:
+            raise ValueError('messages is required')
+        return msg_list

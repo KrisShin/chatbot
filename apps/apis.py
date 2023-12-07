@@ -2,6 +2,7 @@ import logging
 from uuid import uuid4
 
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 
 from apps.pydantics import ChatValidator, ResponseModel
 from common.chat_utils import ChatUtil
@@ -28,16 +29,16 @@ async def chat():
 
 
 @router.post('/chat/{chat_id}')
-async def chat(chat_id: str, message: ChatValidator):
-    chat = CHAT_MAPPING.get(chat_id)
+async def chat(chat_id: str, msg_list: ChatValidator):
+    chat: ChatUtil = CHAT_MAPPING.get(chat_id)
     if not chat:
-        return ResponseModel(code=404, message='chat not found')
-    stream = chat.chat(message.msg)
-    answer = ''
-    for chunk in stream:
-        if chunk.choices[0].delta.content is not None:
-            msg = chunk.choices[0].delta.content or ''
-            answer += msg
-            print(msg, end='')
-    chat.messages.append({'role': 'assistant', 'content': answer})
-    return answer
+        return ResponseModel(code=404, message='chat not found'), 404
+    stream = chat.chat(msg_list.messages)
+
+    def stream_generator():
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                msg = chunk.choices[0].delta.content or ''
+                yield msg.encode('utf-8')
+
+    return StreamingResponse(stream_generator(), media_type="stream/text")

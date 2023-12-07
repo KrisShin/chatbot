@@ -28,7 +28,7 @@ export default function Home() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        msg: message.content
+        messages: updatedMessages
       })
     });
 
