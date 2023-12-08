@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
 from apps.pydantics import ChatValidator, ResponseModel
-from common.chat_utils import ChatUtil
+from common.chat_util import ChatUtil
 from common.global_variables import CHAT_MAPPING
 
 logger = logging.getLogger(__name__)

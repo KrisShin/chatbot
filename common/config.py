@@ -1,9 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from common.settings import DEBUG
+
 
 def create_app():
-    app = FastAPI()
+    if DEBUG:
+        app = FastAPI()
+    else:
+        app = FastAPI(docs_url=None)
 
     origins = [
         "http://localhost",
