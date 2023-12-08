@@ -1,4 +1,5 @@
 import logging
+import re
 from uuid import uuid4
 
 from fastapi import APIRouter
@@ -33,7 +34,13 @@ async def chat(chat_id: str, msg_list: ChatValidator):
     chat: ChatUtil = CHAT_MAPPING.get(chat_id)
     if not chat:
         return ResponseModel(code=404, message='chat not found'), 404
-    stream = chat.chat(msg_list.messages)
+    
+    sites = re.findall(r"https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+/(?:(?:[^\s/]*)(?:/[^\s/]+)*)/?", msg_list.messages[-1]['content'])
+    print('parse site:', sites)
+    if sites:
+        stream = chat.with_rag(sites, msg_list.messages)
+    else:
+        stream = chat.chat(msg_list.messages)
 
     def stream_generator():
         for chunk in stream:

@@ -120,11 +120,16 @@ if __name__ == "__main__":
     chat = ChatUtil()
     msg = '你好'
     messages = []
-    web_paths = ("https://lilianweng.github.io/posts/2023-06-23-agent/",)
+    # web_paths = ("https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",)
     while msg:
         if msg is not True:
             messages.append({'role': 'user', 'content': msg})
-            stream = chat.with_rag(web_paths, messages)
+            sites = re.findall(r"https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+/(?:(?:[^\s/]*)(?:/[^\s/]+)*)/?", msg)
+            print('parse site:', sites)
+            if sites:
+                stream = chat.with_rag(sites, messages)
+            else:
+                stream = chat.chat(messages)
             answer = ""
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
