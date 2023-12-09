@@ -1,5 +1,5 @@
-# kris-interview-chatbot
-kris interview chatbot
+# chatbot
+a chatbot with fastapi
 
 
 Use OpenAI Chat Completion / Function Calling API to implement an end to end Chat Assistant (with custom retreival tool (RAG))
